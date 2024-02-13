@@ -1,0 +1,16 @@
+<app-header [title]="'Gestion de productos'"></app-header>
+<ion-content>
+  <ion-title class="ion-padding">Cargar producto</ion-title>
+  <form [formGroup]="productForm"  (ngSubmit)="onSubmit()">
+    <div class="ion-padding">
+      <ion-item [class.ng-invalid]="productForm.get('nombre')?.invalid && productForm.get('nombre')?.touched">
+        <ion-input type="text"   errorText="Ingrese un nombre" formControlName="nombre"  label="Nombre del producto"/>
+      </ion-item>
+      <div class="ion-text-end ion-padding">
+        <ion-button type="submit"    shape="round" style="width: 100px;">
+          Guardar
+        </ion-button>
+      </div>
+    </div>
+  </form>
+</ion-content>

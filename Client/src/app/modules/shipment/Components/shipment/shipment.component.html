@@ -1,0 +1,65 @@
+<ion-card color="tertiary" style="margin-bottom: 0; font-size: 12px; text-align: center;">
+  <ion-card-content style="padding: 8px;">
+    <!-- Información del cliente y dirección -->  
+      <div  class="minicard" style="text-align: center;">
+        <ion-grid>
+          <fa-icon [icon]="faPerson" size="lg"></fa-icon>
+          <span style="margin-left: 5px;">{{shipment.clientName | titlecase }}</span>
+          <p>
+            <fa-icon [icon]="faHouseUser" size="lg"></fa-icon>
+            <span style="margin-left: 5px;">{{shipment.street}} {{shipment.number}}, {{shipment.location}}</span>
+          </p>
+        </ion-grid>
+      </div>
+    <!-- Resto de la información (mostrar u ocultar según el estado) -->
+      <ng-container *ngIf="showDetails">
+        <!-- Sección de Productos -->
+          <div  class="minicard">
+            <ion-grid>
+              <ion-row>
+                <ion-col size="12">
+                  <fa-icon [icon]="faCirclePlus" style="color: #63E6BE;" size="lg" (click)="openProductModal(shipment.id)"></fa-icon>
+                </ion-col>
+              </ion-row>
+              <ion-row >
+                <ion-col size="6" *ngFor="let product of shipment?.products">
+                  <ng-container *ngIf="product" >
+                    <fa-icon [icon]="faBottleWater" size="2x"></fa-icon>
+                    {{product.name}} {{product.amount}}
+                    <fa-icon [icon]="faDeleteLeft" size="lg"  (click)="openConfirmationModal(product.id)" style="margin-left: 3px; color: #d25019;"></fa-icon>
+                  </ng-container>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </div>
+        <!-- Sección de Nota y Total -->
+          <ng-container >
+            <ion-grid fixed>
+              <ion-row>
+                <ion-col size="6">
+                  <div class="minicard">
+                     <p class="card-contenido">{{shipment.note}}</p> 
+                  </div>
+                </ion-col>
+                <ion-col size="6">
+                  <div  class="minicard" >
+                      <p class="card-contenido"> {{shipment.price | currency}} </p>   
+                  </div>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ng-container>
+      </ng-container>
+    <!-- Botón para mostrar/ocultar el resto de la información -->
+    <div class="div">
+      <ion-button  (click)="toggleDetails()" fill="clear" color="dark" size="small" style="margin-bottom: 8px;">
+        <fa-icon [icon]="showDetails ? faWindowMinimize : faWindowMaximize" size="lg"></fa-icon>
+      </ion-button>
+    </div>
+    <!-- Botones de acción -->
+        <fa-icon [icon]="faPenToSquare"  [routerLink]="['/tabs/editShipment', shipmentId]" style="color:aqua" size="lg"></fa-icon>
+        <fa-icon style="margin-left: 15px;  color: orange;"  [icon]="faTrash" (click)="confirmationDeleteShipment()" size="lg"></fa-icon>
+        <fa-icon style="margin-left: 15px;"  (click)="abrirGoogleMaps()"  [icon]="faLocationDot" size="lg"></fa-icon>
+  </ion-card-content>
+</ion-card>
+

@@ -1,0 +1,44 @@
+/* Puedes ajustar estos estilos según tus necesidades */
+
+  
+  ion-button {
+    margin-top: 15px;
+  }
+  
+
+  .item {
+    margin: 10px 10px 10px 10px;
+    color: red;
+  }
+  
+  .step-indicators {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  
+.step-indicator {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  overflow: hidden; /* Evitar que el texto se salga del círculo */
+  font-size: 0.9em; /* Reducir el tamaño de la fuente para que quepa completamente */
+}
+.step-line {
+  height: 2px; /* Ajusta el grosor de la línea según sea necesario */
+  background-color: #ccc; /* Color de la línea */
+  flex: 1; /* La línea ocupa todo el espacio restante */
+  margin: 0 5px; /* Espaciado entre la línea y los indicadores */
+  margin-top: 14px; /* Centrar verticalmente la línea con respecto a los círculos */
+}
+
+.step-indicator.completed {
+    background-color: #007bff; /* Color para los pasos completados */
+}
+  

@@ -1,0 +1,53 @@
+<app-header [title]="'Editar pedido'"></app-header>
+<ion-content>
+  <ion-grid>
+    <form [formGroup]="shipmentForm" (ngSubmit)="onsubmit()">
+        <ion-item  >
+          <ion-input type="text" formControlName="clientName" errorText="Ingrese un nombre" label="Nombre"></ion-input>
+        </ion-item>
+
+        <!-- Detalles de la Dirección -->
+        <ion-item >
+          <ion-select  placeholder="Localidad" formControlName="location_id" errorText="Ingrese una localidad" >
+            <ion-select-option value="1">Tristan suarez</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-text *ngIf="selectError || validateOnTouched('location_id')" color="danger" style="margin-left: 10px;">
+          Por favor, selecciona una localidad.
+        </ion-text>
+        <ion-item>
+          <ion-input type="text" formControlName="street" label="calle" errorText="Ingrese una calle"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-input type="text" formControlName="number" label="numero" errorText="Ingrese un numero"></ion-input>
+        </ion-item>
+
+        <!-- Detalles de la Entrega -->
+        <ion-item>
+          <ion-input type="text" formControlName="price" label="Precio" errorText="Ingrese un precio"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input type="date" formControlName="date"  label="Fecha" errorText="Ingrese una fecha "></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-textarea labelPlacement="floating" value="Nota" formControlName="note" errorText="Ingrese una nota al pedido">
+            <div slot="label">Nota pedido</div>
+          </ion-textarea>
+        </ion-item>
+        
+        <ion-item>
+          <ion-select  placeholder="Estado" formControlName="state">
+            <ion-select-option value="1">A ENTREGAR</ion-select-option>
+            <ion-select-option value="2">ENTREGADO</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-text *ngIf="validateOnTouched('state')" color="danger" style="margin-left: 10px;">
+          Por favor, selecciona un estado del pedido.
+        </ion-text>
+      <!-- Botón de Envío -->
+      <ion-button expand="full" type="submit">Enviar</ion-button>
+    </form>
+  </ion-grid>
+</ion-content>

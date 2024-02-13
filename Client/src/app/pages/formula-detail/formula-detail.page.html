@@ -1,0 +1,31 @@
+<ion-header mode="md">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content mode="ios">
+
+      <ion-grid >
+        <ion-row>
+          <ion-col class="d-flex-center" size="12" *ngIf="formula && !formulaCalculada">
+            <p>Formula base de:  {{formula.nombre }}</p>
+            <p *ngFor="let materia of formula.materias">{{materia.nombre}} : {{materia.cantidades}}</p>
+          </ion-col>
+          <ion-col class="d-flex-center" size="12" *ngIf="formulaCalculada">
+            <p>Formula base de:  {{formulaCalculada.nombre }}</p>
+            <p *ngFor="let materia of formulaCalculada.materias">{{materia.nombre}} : {{materia.cantidades}}</p>
+          </ion-col>
+          <ion-col size="12" class="ion-padding" >
+            <input type="text" placeholder="Inserte Cantidad" [(ngModel)]="cantidad" name="cantidad">
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="12"><ion-button (click)="calcular()">calcular</ion-button></ion-col>
+        </ion-row>
+      </ion-grid>
+       <!-- Muestra la propiedad nombre -->
+  
+</ion-content>

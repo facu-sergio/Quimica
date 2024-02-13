@@ -1,0 +1,22 @@
+  <app-header [title]="'Pedidos del ' + fecha"></app-header>
+  <ion-content>
+    <ion-grid fixed>
+      <ion-row>
+        <ion-col size="3">
+          <ion-button size="small" color="primary" routerLink="/tabs/Newshipment"> Cargar pedido </ion-button>
+        </ion-col>
+      </ion-row>
+      <ion-row *ngIf="shipments?.length===0">
+        <ion-col size="12">
+          No hay pedidos cargados esta fecha
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ng-container *ngFor="let shipment of shipments">
+            <app-shipment (deleteProductRequest)="deleteProduct($event)" (deleteShipmentRequest)="DeleteShipment($event)"  (refreshShipmentsRequest)="getShipments()" [shipment]="shipment" ></app-shipment>
+          </ng-container>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-content>

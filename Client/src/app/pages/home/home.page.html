@@ -1,0 +1,24 @@
+<ion-header mode="md">
+  <ion-toolbar>
+    <ion-title>
+      <strong>Quimica</strong>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content mode="ios">
+  <ion-grid>
+    <ion-row>
+      <ion-col  size="12"><h1>Formulas</h1></ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <swiper-container>
+    <swiper-slide *ngFor="let formula of formulas">
+      <img *ngIf="formula.formula_id === 1" src="../../../assets/img/tipo-ariel.png" alt="">
+      <img *ngIf="formula.formula_id === 2" src="../../../assets/img/MAGISTRAL-D.png" alt="">
+      <p>{{formula.nombre}}</p> 
+      <ion-button [routerLink]="'/detail/' + formula.formula_id">Calcular formula</ion-button>
+    </swiper-slide>
+  </swiper-container>
+</ion-content>

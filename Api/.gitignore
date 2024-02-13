@@ -1,0 +1,9 @@
+Core/bin
+Quimica.Service/bin
+FormulasApi/bin
+FormulasApi/publish
+FormulasApi/obj
+Core/obj
+Quimica.service/obj
+.vs
+.vscode

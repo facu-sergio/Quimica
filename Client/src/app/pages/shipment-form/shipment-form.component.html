@@ -1,0 +1,112 @@
+<app-header [title]="'Cargar pedido'"></app-header>
+<ion-content>
+  <ion-grid>
+    <div class="step-indicators">
+      <div class="step-indicator" (click)="goToStep(1)" [class.completed]="step >= 1">
+        1
+      </div>
+      <div class="step-line"></div>
+      <div class="step-indicator" (click)="goToStep(2)" [class.completed]="step >= 2">
+        2
+      </div>
+      <div class="step-line"></div>
+      <div class="step-indicator" (click)="goToStep(3)" [class.completed]="step >= 3">
+        3
+      </div>
+    </div>
+    <form [formGroup]="shipmentForm" (ngSubmit)="onsubmit()" style="margin-top: 25px;">
+      <!-- Detalles de la Dirección -->
+      <ng-container *ngIf="step===1">
+        <ion-title>Datos del cliente</ion-title>
+        <ion-item>
+          <ion-input type="text" formControlName="clientName" errorText="Ingrese un nombre" label="Nombre"></ion-input>
+        </ion-item> 
+        <ion-text *ngIf="selectError || validateOnTouched('clientName')" color="danger" style="margin-left: 10px;">
+          Por favor, ingresa un nombre.
+        </ion-text>
+        <ion-item >
+          <ion-select  placeholder="Localidad" formControlName="location_id" errorText="Ingrese una localidad" >
+            <ion-select-option value="1">Tristan suarez</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-text *ngIf="selectError || validateOnTouched('location_id')" color="danger" style="margin-left: 10px;">
+          Por favor, selecciona una localidad.
+        </ion-text>
+        <ion-item>
+          <ion-input type="text" formControlName="street" label="calle" errorText="Ingrese una calle"></ion-input>
+        </ion-item>
+        <ion-text *ngIf="selectError || validateOnTouched('street')" color="danger" style="margin-left: 10px;">
+          Por favor, ingresa una calle.
+        </ion-text>
+
+        <ion-item>
+          <ion-input type="text" formControlName="number" label="numero" errorText="Ingrese un numero"></ion-input>
+        </ion-item>
+        <ion-text *ngIf="selectError || validateOnTouched('number')" color="danger" style="margin-left: 10px;">
+          Por favor, ingresa un numero de calle.
+        </ion-text>
+      </ng-container>
+        
+
+      <!-- Detalles de la Entrega -->
+      <ng-container *ngIf="step===2">
+        <ion-title>Datos del Pedido</ion-title>
+        <ion-item>
+          <ion-input type="text" formControlName="price" label="Precio" errorText="Ingrese un precio"></ion-input>
+        </ion-item>
+        <ion-text *ngIf="selectError || validateOnTouched('price')" color="danger" style="margin-left: 10px;">
+          Por favor, ingresa un precio al pedido.
+        </ion-text>
+        <ion-item>
+          <ion-input type="date" formControlName="date" [(ngModel)]="startDate" label="Fecha" errorText="Ingrese una fecha "></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-textarea labelPlacement="floating" value="Nota" formControlName="note" errorText="Ingrese una nota al pedido">
+            <div slot="label">Nota pedido</div>
+          </ion-textarea>
+        </ion-item>
+        
+        <ion-item>
+          <ion-select  placeholder="Estado" formControlName="state">
+            <ion-select-option value="1">A ENTREGAR</ion-select-option>
+            <ion-select-option value="2">ENTREGADO</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-text *ngIf="validateOnTouched('state')" color="danger" style="margin-left: 10px;">
+          Por favor, selecciona un estado del pedido.
+        </ion-text>
+      </ng-container>
+        
+      <!-- Productos -->
+      <ng-container formArrayName="products" *ngIf="step===3">
+        <ng-container *ngFor="let productForm of products.controls; let i = index">
+          <div [formGroupName]="i">
+            <ion-item>
+              <ion-select formControlName="id" placeholder="Producto">
+                <ion-select-option *ngFor="let product of Products;let i = index" [value]="product.id">{{product.name}}</ion-select-option>
+              </ion-select>
+            </ion-item>
+            <ion-text *ngIf="selectError || validateOnToucchedProduct(i,'id')" color="danger" style="margin-left: 10px;">
+              Por favor, selecciona un producto.
+            </ion-text>
+            <ion-item>
+              <ion-input label="Cantidad" formControlName="amount" label=" cantidad" errorText="Ingrese una cantidad"/>
+            </ion-item>
+          </div>
+        </ng-container>
+        <ion-item>
+          <ion-button fill="clear" (click)="addProduct()">Agregar Producto</ion-button>
+        </ion-item>
+      </ng-container>
+       
+      <!-- Botón de Envío -->
+      <div>
+           <ion-button size="small" color="success" type="submit" *ngIf="step===3">Enviar</ion-button>
+      <ion-button size="small"   (click)="nextStep()" *ngIf="step<3">Siguiente</ion-button>
+      <ion-button  size="small" (click)="prevStep()" *ngIf="step>1">Anterior</ion-button>
+      </div>
+   
+    </form>
+  </ion-grid>
+</ion-content>
