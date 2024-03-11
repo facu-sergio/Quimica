@@ -10,6 +10,7 @@ namespace Quimica.Core.Models.Filters
     {
         public string? street { get; set; }
         public string? number { get; set; }
-        public DateTime Date { get; set; }
+        public DateTime? Date { get; set; }
+        public int? Skip { get;set; }
     }
 }

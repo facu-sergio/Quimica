@@ -3,6 +3,7 @@ using FormulasApi.DTOS;
 using Microsoft.AspNetCore.Mvc;
 using Quimica.Core.Bussiness;
 using Quimica.Core.Models;
+using Quimica.Core.Models.Filters;
 using Quimica.Service.Business;
 
 namespace FormulasApi.Controllers
@@ -20,11 +21,15 @@ namespace FormulasApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> getAllByDate(DateTime date)
+        public async Task<IActionResult> getByFilters(ShipmentFilter filter)
         {
             try
             {
-                var shipments = await _shipmentService.GetShipmentsByDate(date);
+                if(filter.street == null && filter.Date == null)
+                {
+                    return BadRequest("required street or date");
+                }
+                var shipments = await _shipmentService.GetShipmentsByFilter(filter);
                 var shipmentDtos = _mapper.Map<IEnumerable<ShipmentDto>>(shipments);
                 return Ok(shipmentDtos);
             }

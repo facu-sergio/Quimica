@@ -1,4 +1,5 @@
 ﻿using Quimica.Core.Models;
+using Quimica.Core.Models.Filters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace Quimica.Core.DataAccess
         Task  AddProductShipment(shipments_products shipments_Products);
         Task DeleteProductShipment(int idShipment, int idProdut);
         Task DeleteShipment(int shipmentId);
-        Task<IEnumerable<Shipment>> GetShipmentsByDate(DateTime date);
+        Task<IEnumerable<Shipment>> GetShipmentsByFilter(ShipmentFilter filter);
 
     }
 }

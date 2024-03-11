@@ -2,7 +2,9 @@
 using Microsoft.Extensions.Logging;
 using Quimica.Core.DataAccess;
 using Quimica.Core.Models;
+using Quimica.Core.Models.Filters;
 using System.Data;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Quimica.Service.DataAccess
 {
@@ -93,51 +95,70 @@ namespace Quimica.Service.DataAccess
                 throw;
             }
         }
-        public async Task<IEnumerable<Shipment>> GetShipmentsByDate(DateTime Date)
+        public async Task<IEnumerable<Shipment>> GetShipmentsByFilter(ShipmentFilter filter)
         {
             try
             {
                 using (IDbConnection db = _connectionBuilder.GetConnection())
                 {
-
                     string query = @"SELECT s.*,p.*, sp.amount,a.*,l.*
                                     FROM Shipments s
                                     LEFT JOIN address a ON a.id = s.addres_id  
                                     LEFT JOIN shipments_products sp ON s.id = sp.id_shipment
                                     LEFT JOIN products p ON sp.id_product = p.id
-                                    JOIN Location l ON l.id = a.location_id 
-                                    WHERE s.date =  @date;";
+                                    JOIN Location l ON l.id = a.location_id ";
+
+                    if (filter.Date!=null) { query += @"WHERE s.date = @date"; }
+
+
+                    if(filter.street != null){
+                        query += @" WHERE a.street=@street";
+
+                        if (filter.number != null)
+                        {
+                            query += " AND a.number =@number";
+                        }                         
+                    }
+
+                    query += @" ORDER BY date DESC
+                                OFFSET @skipNumber ROWS
+                                FETCH NEXT 5 ROWS ONLY;";
 
                     var shipmentsDictionary = new Dictionary<int, Shipment>();
-
                     await db.QueryAsync<Shipment, ProductOfShipment, Address, Location, Shipment>(query,
-                        (shipment, product, address, location) =>
-                        {
-                            if (!shipmentsDictionary.TryGetValue(shipment.Id, out var existingShipment))
-                            {
-                                // Si no existe en el diccionario, lo agregamos
-                                existingShipment = shipment;
-                                existingShipment.Products = new List<ProductOfShipment>();
-                                existingShipment.Address = address;
-                                existingShipment.Address.Location = location;
-                                shipmentsDictionary.Add(existingShipment.Id, existingShipment);
-                            }
+                       (shipment, product, address, location) =>
+                       {
+                           if (!shipmentsDictionary.TryGetValue(shipment.Id, out var existingShipment))
+                           {
+                               // Si no existe en el diccionario, lo agregamos
+                               existingShipment = shipment;
+                               existingShipment.Products = new List<ProductOfShipment>();
+                               existingShipment.Address = address;
+                               existingShipment.Address.Location = location;
+                               shipmentsDictionary.Add(existingShipment.Id, existingShipment);
+                           }
 
-                            existingShipment.Products.Add(product);
-                            return existingShipment;
-                        },
-                        new { date = Date },
-                        splitOn: "id,id,id,id"
-                    );
+                           existingShipment.Products.Add(product);
+                           return existingShipment;
+                       },
+                       new
+                       {
+                           date = filter.Date,
+                           street = filter.street,
+                           number = filter.number,
+                           skipNumber = filter.Skip
+                       },
+                       splitOn: "id,id,id,id"
+                   );
 
                     var uniqueShipments = shipmentsDictionary.Values.ToList();
 
                     return uniqueShipments;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 
@@ -269,6 +290,7 @@ namespace Quimica.Service.DataAccess
 
         }
 
+        #region privaMethods
 
         private async Task<int> InsertAddress(IDbConnection db, Address address, IDbTransaction transaction)
         {
@@ -380,5 +402,6 @@ namespace Quimica.Service.DataAccess
             string query = @"DELETE FROM shipments_products WHERE id_shipment = @shipmentID";
             await db.ExecuteAsync(query, new { shipmentID = shipmentId }, transaction);
         }
+        #endregion
     }
 }

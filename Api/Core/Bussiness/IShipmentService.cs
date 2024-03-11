@@ -1,4 +1,5 @@
 ﻿using Quimica.Core.Models;
+using Quimica.Core.Models.Filters;
 
 namespace Quimica.Core.Bussiness
 {
@@ -9,7 +10,7 @@ namespace Quimica.Core.Bussiness
        Task AddProductShipment(shipments_products shipments_Products);
        Task DeleteProductShipment(int idShipment, int idProdut);
        Task DeleteShipment(int shipmentId);
-       Task<IEnumerable<Shipment>> GetShipmentsByDate(DateTime date);
+       Task<IEnumerable<Shipment>> GetShipmentsByFilter(ShipmentFilter filter);
        Task<Shipment> GetshipmentById(int id);
     }
 }

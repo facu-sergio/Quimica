@@ -4,6 +4,7 @@ using Quimica.Core.Models;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Quimica.Core.Models.Filters;
 
 namespace Quimica.Service.Business
 {
@@ -64,16 +65,16 @@ namespace Quimica.Service.Business
         }
 
 
-        public async Task<IEnumerable<Shipment>> GetShipmentsByDate(DateTime date)
+        public async Task<IEnumerable<Shipment>> GetShipmentsByFilter(ShipmentFilter filter)
         {
             try
             {
-                return await _shipmentRepository.GetShipmentsByDate(date);
+                return await _shipmentRepository.GetShipmentsByFilter(filter);
 
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"ShipmentService/GetShipmentsByDate({date})");
+                _logger.LogError(ex, $"ShipmentService/GetShipmentsByFilter({filter})");
                 throw ex;
             }
         }
