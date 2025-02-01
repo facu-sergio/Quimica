@@ -29,6 +29,7 @@ builder.Services.AddTransient<IShipmentService,ShipmentService>();
 builder.Services.AddTransient<IShipmentRepository,ShipmentRepository>();
 builder.Services.AddTransient<IproductRepository, ProductRepository>();
 builder.Services.AddTransient<IProductService, ProductService>();
+builder.Services.AddTransient<ISummaryShipmentsService, SummaryShipmentsService>();
 builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddCors(options =>

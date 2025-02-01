@@ -16,6 +16,8 @@ namespace Quimica.Core.DataAccess
         Task DeleteProductShipment(int idShipment, int idProdut);
         Task DeleteShipment(int shipmentId);
         Task<IEnumerable<Shipment>> GetShipmentsByDate(DateTime date);
+        Task<IEnumerable<Shipment>> GetShipmentsByDateRange(DateTime dateFrom, DateTime dateTo);
+        Task<List<ProductOfShipment>> GetProductsByShipment(int idShipment);
 
     }
 }

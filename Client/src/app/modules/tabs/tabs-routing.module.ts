@@ -25,9 +25,22 @@ const routes: Routes = [
        loadChildren: () => import ('../../pages/home/home.module').then(m => m.HomePageModule)
       },
       {
+        path: 'detail/:id',
+        loadChildren: () => import ('../../pages/formula-detail/formula-detail.module').then(m => m.FormulaDetailPageModule)
+       },
+      {
         path: 'products',
         loadChildren: () => import('../../pages/products/products.module').then(m => m.ProductsModule)
-      }
+      },
+      {
+        path: 'dashboard',
+        loadChildren: () => import('../../pages/dashboard/dashboardPage.module').then(m => m.DashboardPageModule)
+      },
+      {
+        path: 'products-summary',
+        loadChildren: () => import('../../pages/products-summary/producs-summary.module').then(m => m.ProductsSummaryModule)
+      },
+     
   ]
   },
   {

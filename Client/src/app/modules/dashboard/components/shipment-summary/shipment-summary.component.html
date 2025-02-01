@@ -1,0 +1,40 @@
+<div class="ion-page" id="main-content">
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="6">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>Total de Pedidos del año</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <h2>{{ shipmentsList.length }}</h2>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col size="12" size-md="6">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>Pedidos este mes</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <h2>{{ currentMonthCount }}</h2> 
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>Pedidos por Mes</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <div style="position: relative; height: 400px; width: 100%;">
+                <canvas #barCanvas></canvas>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+</div>

@@ -18,7 +18,7 @@
       <img *ngIf="formula.formula_id === 1" src="../../../assets/img/tipo-ariel.png" alt="">
       <img *ngIf="formula.formula_id === 2" src="../../../assets/img/MAGISTRAL-D.png" alt="">
       <p>{{formula.nombre}}</p> 
-      <ion-button [routerLink]="'/detail/' + formula.formula_id">Calcular formula</ion-button>
+      <ion-button [routerLink]="'/tabs/detail/' + formula.formula_id">Calcular formula</ion-button>
     </swiper-slide>
   </swiper-container>
 </ion-content>

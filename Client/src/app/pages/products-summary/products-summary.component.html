@@ -1,0 +1,22 @@
+<ion-content>
+  <ion-grid fixed>
+    <ion-row>
+      <ion-col size="12" class="ion-text-center">
+        <p>Ventas por producto</p>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="12">
+        <ion-item>
+          <input type="month" id="start" name="start" (change)="onMonthChange($event)"
+            min="2020-08" value="2020-10" [(ngModel)]="selectedMonth">
+        </ion-item>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="12">
+        <app-productsGrid></app-productsGrid>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

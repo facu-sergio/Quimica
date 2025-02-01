@@ -8,8 +8,9 @@ namespace Quimica.Core.Models
 {
     public class shipments_products
     {
-        public int idShipment { get; set; }
-        public int idProduct { get; set; }
-        public string amount { get; set; }
+        public int IdShipment { get; set; }
+        public int IdProduct { get; set; }
+        public decimal  Amount { get; set; }
+        public string Unit { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Quimica.Core.DataAccess;
 using Quimica.Core.Models;
 using System.Data;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Quimica.Service.DataAccess
 {
@@ -141,6 +142,30 @@ namespace Quimica.Service.DataAccess
             }
         }
 
+
+        public async Task<IEnumerable<Shipment>> GetShipmentsByDateRange(DateTime dateFrom, DateTime dateTo)
+        {
+
+            try
+            {
+                using (IDbConnection db = _connectionBuilder.GetConnection())
+                {
+                    string query = @"SELECT *
+                     FROM Shipments
+                     WHERE [date] >= @dateFrom AND [date] <= @dateTo";
+
+                    return await db.QueryAsync<Shipment>(query, new { dateFrom = dateFrom, dateTo = dateTo });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error in ShipmentRepository/GetShipmentsByDateRange: {ex.Message}");
+                throw ex;
+            }
+
+        }
+
+
         public async Task<Shipment> GetShipmentByIdAsync(int id)
         {
             try
@@ -148,7 +173,7 @@ namespace Quimica.Service.DataAccess
 
                 using (IDbConnection db = _connectionBuilder.GetConnection())
                 {
-                    string query = @"SELECT s.*, p.*, sp.amount, a.*, l.*
+                    string query = @"SELECT s.*, p.*, sp.amount,sp.unit_of_measure, a.*, l.*
                                     FROM Shipments s
                                     LEFT JOIN address a ON a.id = s.addres_id  
                                     LEFT JOIN shipments_products sp ON s.id = sp.id_shipment
@@ -191,9 +216,9 @@ namespace Quimica.Service.DataAccess
 
                     var param = new
                     {
-                        idShipment = shipments_Products.idShipment,
-                        idProduct = shipments_Products.idProduct,
-                        amount = shipments_Products.amount
+                        idShipment = shipments_Products.IdShipment,
+                        idProduct = shipments_Products.IdProduct,
+                        amount = shipments_Products.Amount
                     };
                     await db.ExecuteAsync(query, param);
                 }
@@ -269,6 +294,33 @@ namespace Quimica.Service.DataAccess
 
         }
 
+        public async Task<List<ProductOfShipment>> GetProductsByShipment(int idShipment)
+        {
+            try
+            {
+                using (IDbConnection db = _connectionBuilder.GetConnection())
+                {
+                    string query = @"
+                SELECT sp.*, p.name AS Name  
+                FROM shipments_products sp           
+                LEFT JOIN products p ON p.id = sp.id_product   
+                WHERE sp.id_shipment = @idShipment"; 
+        
+            var products = await db.QueryAsync<ProductOfShipment>(
+                query,
+                new { idShipment }  // Simplifica el parámetro
+            );
+
+                    return products.ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error in ShipmentRepository/GetProductsByShipment: {ex.Message}"); // Corrige el nombre del método
+                throw;
+            }
+        }
+
 
         private async Task<int> InsertAddress(IDbConnection db, Address address, IDbTransaction transaction)
         {
@@ -308,10 +360,10 @@ namespace Quimica.Service.DataAccess
         {
             foreach (ProductOfShipment product in products)
             {
-                string query = @"INSERT INTO shipments_products (id_shipment,id_product,amount)
-                                 VALUES(@idShipment,@idProduct,@amount)";
+                string query = @"INSERT INTO shipments_products (id_shipment,id_product,amount,unit_of_measure)
+                                 VALUES(@idShipment,@idProduct,@amount,@unit_of_measure)";
 
-                var param = new { idShipment = idShipment, idProduct = product.Id, amount = product.Amount };
+                var param = new { idShipment = idShipment, idProduct = product.Id, amount = product.Amount, product.unit_of_measure };
 
                 await db.ExecuteAsync(query, param, commandType: CommandType.Text, transaction: transaction);
             }
@@ -380,5 +432,7 @@ namespace Quimica.Service.DataAccess
             string query = @"DELETE FROM shipments_products WHERE id_shipment = @shipmentID";
             await db.ExecuteAsync(query, new { shipmentID = shipmentId }, transaction);
         }
+
+       
     }
 }
