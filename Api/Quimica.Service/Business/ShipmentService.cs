@@ -4,6 +4,7 @@ using Quimica.Core.Models;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Quimica.Service.DataAccess;
 
 namespace Quimica.Service.Business
 {
@@ -11,10 +12,13 @@ namespace Quimica.Service.Business
     {
         private readonly IShipmentRepository _shipmentRepository;
         private readonly ILogger<ShipmentService> _logger;
+        private readonly IGenericRepository<Shipment> _shipmentGenericRepository;
 
-        public ShipmentService(IShipmentRepository shipmentRepository, ILogger<ShipmentService> logger)
+        public ShipmentService(IShipmentRepository shipmentRepository, ILogger<ShipmentService> logger, 
+                                IGenericRepository<Shipment> shipmentGenericRepository)
         {
             _shipmentRepository = shipmentRepository;
+            _shipmentGenericRepository = shipmentGenericRepository;
             _logger = logger;
         }
        
@@ -24,6 +28,7 @@ namespace Quimica.Service.Business
             try
             {
                 await _shipmentRepository.InsertShipment(shipment);
+                //await _shipmentGenericRepository.AddAsync(shipment);
             }
             catch (Exception ex)
             {

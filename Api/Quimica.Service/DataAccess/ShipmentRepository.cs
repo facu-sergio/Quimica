@@ -11,13 +11,26 @@ namespace Quimica.Service.DataAccess
     {
         private readonly IConnectionBuilder _connectionBuilder;
         private readonly ILogger<ShipmentRepository> _logger;
+        private readonly IGenericRepository<Shipment> _shipmentRepo;
+        private readonly IGenericRepository<Address> _addressRepo;
+        private readonly IGenericRepository<shipments_products> _productRepo;
 
-        public ShipmentRepository(IConnectionBuilder connectionBuilder, ILogger<ShipmentRepository> logger)
+        public ShipmentRepository(IConnectionBuilder connectionBuilder, 
+                                  ILogger<ShipmentRepository> logger,
+                                  IGenericRepository<Shipment> shipmentRepo,
+                                  IGenericRepository<Address> addressRepo,
+                                  IGenericRepository<shipments_products> productRepo
+                                  )
         {
+            _shipmentRepo = shipmentRepo;
+            _addressRepo = addressRepo;
+            _productRepo = productRepo;
             _connectionBuilder = connectionBuilder;
             _logger = logger;
         }
 
+
+        
 
         public async Task InsertShipment(Shipment shipment)
         {
@@ -32,13 +45,23 @@ namespace Quimica.Service.DataAccess
                         try
                         {
                             // INSERT ADDRESS
-                            int InsertedAddresid = await InsertAddress(db, shipment.Address, transaction);
+                            shipment.Address.Location = null;
+                            int InsertedAddresid = await _addressRepo.AddAsync(shipment.Address, transaction);
 
                             // INSERT SHIPMENTS
-                            int InserShipmentId = await InsertShipmentDetails(db, shipment, InsertedAddresid, transaction);
+                            shipment.addres_id = InsertedAddresid;
+
+                            int InserShipmentId = await _shipmentRepo.AddAsync( shipment,  transaction);
 
                             // INSERT PRODUCTS
-                            await InsertProducts(db, shipment.Products, InserShipmentId, transaction);
+                            if (shipment.Products?.Any() == true)
+                            {
+                                foreach (var product in shipment.Products)
+                                {
+                                    product.Id_shipment = InserShipmentId;
+                                    await _productRepo.AddAsync(product, transaction);
+                                }
+                            }
 
                             transaction.Commit();
                         }
@@ -70,15 +93,17 @@ namespace Quimica.Service.DataAccess
                     {
                         try
                         {
-                            Shipment shipmentExist = await GetShipmentByIdAsync(shipment.Id);
 
-                            await UpdateAddress(db, shipment.Address, transaction);
-
-                            await UpdateShipmentDetails(db, shipment, transaction);
+                            Shipment shipmentExist = await _shipmentRepo.GetByIdAsync(shipment.Id);
+                            if (shipmentExist!=null)
+                            {
+                                shipment.Address.Id = shipmentExist.addres_id;
+                                await _addressRepo.UpdateAsync(shipment.Address);
+                                await _shipmentRepo.UpdateAsync(shipment);
+                            }
+                            
 
                             transaction.Commit();
-
-
                         }
                         catch (Exception ex)
                         {
@@ -111,14 +136,14 @@ namespace Quimica.Service.DataAccess
 
                     var shipmentsDictionary = new Dictionary<int, Shipment>();
 
-                    await db.QueryAsync<Shipment, ProductOfShipment, Address, Location, Shipment>(query,
+                    await db.QueryAsync<Shipment, shipments_products, Address, Location, Shipment>(query,
                         (shipment, product, address, location) =>
                         {
                             if (!shipmentsDictionary.TryGetValue(shipment.Id, out var existingShipment))
                             {
                                 // Si no existe en el diccionario, lo agregamos
                                 existingShipment = shipment;
-                                existingShipment.Products = new List<ProductOfShipment>();
+                                existingShipment.Products = new List<shipments_products>();
                                 existingShipment.Address = address;
                                 existingShipment.Address.Location = location;
                                 shipmentsDictionary.Add(existingShipment.Id, existingShipment);
@@ -181,7 +206,7 @@ namespace Quimica.Service.DataAccess
                                     LEFT JOIN Location l ON l.id = a.location_id 
                                     WHERE s.id = @idShipment;";
 
-                    Shipment shipment = (await db.QueryAsync<Shipment, ProductOfShipment, Address, Location, Shipment>(
+                    Shipment shipment = (await db.QueryAsync<Shipment, shipments_products, Address, Location, Shipment>(
                         query,
                         (shipment, product, address, location) =>
                         {
@@ -216,8 +241,8 @@ namespace Quimica.Service.DataAccess
 
                     var param = new
                     {
-                        idShipment = shipments_Products.IdShipment,
-                        idProduct = shipments_Products.IdProduct,
+                        idShipment = shipments_Products.Id_shipment,
+                        idProduct = shipments_Products.Id_product,
                         amount = shipments_Products.Amount
                     };
                     await db.ExecuteAsync(query, param);
@@ -264,10 +289,13 @@ namespace Quimica.Service.DataAccess
                         try
                         {
                             // Llamada al primer método para eliminar productos del envío
-                            await DeleteProducts(db, shipmentId, transaction);
+                            //await DeleteProducts(db, shipmentId, transaction);
+
+                            await _productRepo.DeleteAsync("id_shipment = @shipmentId", new { shipmentId });
+;
 
                             // Llamada al tercer método para eliminar el envío
-                            await DeleteShipmentDetails(db, shipmentId, transaction);
+                            await DeleteShipmentDetails(db, shipmentId, transaction); 
 
                             // Llamada al segundo método para eliminar la dirección del envío
                             await DeleteAddress(db, shipment.Address, transaction);
@@ -319,96 +347,6 @@ namespace Quimica.Service.DataAccess
                 _logger.LogError($"Error in ShipmentRepository/GetProductsByShipment: {ex.Message}"); // Corrige el nombre del método
                 throw;
             }
-        }
-
-
-        private async Task<int> InsertAddress(IDbConnection db, Address address, IDbTransaction transaction)
-        {
-            string query = @"INSERT INTO Address(location_id,street,number)
-                            OUTPUT INSERTED.Id  
-                            VALUES (@locationID,@street,@number)";
-
-            var param = new
-            {
-                street = address.Street,
-                number = address.Number,
-                locationID = address.Location.Id
-            };
-
-            return await db.QueryFirstOrDefaultAsync<int>(query, param, commandType: CommandType.Text, transaction: transaction);
-        }
-
-        private async Task<int> InsertShipmentDetails(IDbConnection db, Shipment shipment, int addressId, IDbTransaction transaction)
-        {
-            string query = @"INSERT INTO Shipments(clientName, price, note, date, addres_id, state)
-                             OUTPUT INSERTED.Id   
-                             VALUES (@clientName, @price, @note, @date, @addressId, @state)";
-
-            var param = new
-            {
-                clientName = shipment.ClientName,
-                price = shipment.Price,
-                note = shipment.Note,
-                date = shipment.Date,
-                state = shipment.State,
-                addressId = addressId
-            };
-            return await db.QueryFirstOrDefaultAsync<int>(query, param, commandType: CommandType.Text, transaction: transaction);
-        }
-
-        private async Task InsertProducts(IDbConnection db, List<ProductOfShipment> products, int idShipment, IDbTransaction transaction)
-        {
-            foreach (ProductOfShipment product in products)
-            {
-                string query = @"INSERT INTO shipments_products (id_shipment,id_product,amount,unit_of_measure)
-                                 VALUES(@idShipment,@idProduct,@amount,@unit_of_measure)";
-
-                var param = new { idShipment = idShipment, idProduct = product.Id, amount = product.Amount, product.unit_of_measure };
-
-                await db.ExecuteAsync(query, param, commandType: CommandType.Text, transaction: transaction);
-            }
-
-        }
-        private async Task UpdateAddress(IDbConnection db, Address address, IDbTransaction transaction)
-        {
-
-            if(address.Id == 0 || address.Id == null )
-            {
-                throw new Exception("Id no puede ser 0 o null");
-            }
-
-            string query = @"UPDATE Address 
-                             SET location_id = @locationId, street = @street, number = @number
-                             WHERE id = @addressId";
-
-            var param = new
-            {
-                locationId = address.Location.Id,
-                street = address.Street,
-                number = address.Number,
-                addressId = address.Id
-            };
-
-            await db.ExecuteAsync(query, param, transaction);
-        }
-
-        private async Task UpdateShipmentDetails(IDbConnection db, Shipment shipment, IDbTransaction transaction)
-        {
-            string query = @" UPDATE Shipments 
-                            SET clientName = @clientName, price = @price, note = @note, date = @date, state = @state
-                            WHERE id = @id";
-
-            var param = new
-            {
-                id = shipment.Id,
-                clientName = shipment.ClientName,
-                price = shipment.Price,
-                note = shipment.Note,
-                date = shipment.Date,
-                state = shipment.State
-            };
-
-            await db.ExecuteAsync(query, param, transaction);
         }
 
         private async Task DeleteAddress(IDbConnection db, Address address, IDbTransaction transaction)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Quimica.Core.attributes;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Quimica.Core.Models
 {
+    [Table("shipments")]
     public class Shipment
     {
         public int Id { get; set; }
@@ -19,9 +21,12 @@ namespace Quimica.Core.Models
 
         [Column(TypeName = "date")]
         public DateTime Date { get; set; }
-        public Address Address { get; set; }
 
-        public List<ProductOfShipment>? Products { get; set; } = new List<ProductOfShipment>();
+        [NotUpdatable]
+        public int? addres_id { get; set; } 
+        public Address? Address { get; set; }  // Propiedad de navegación
+
+        public List<shipments_products>? Products { get; set; } = new List<shipments_products>();
         
     }
 }

@@ -19,7 +19,6 @@ namespace FormulasApi.Helpers
                 .ForMember(dest => dest.Number,
                 opt => opt.MapFrom(src => src.Address.Number))
                 .ReverseMap();
-            CreateMap<ProductOfShipment, ProductShipmentDto>().ReverseMap();
 
             CreateMap<ShipmentCreateDto, Shipment>()
                 .ForPath(dest => dest.Address.Location.Id, opt => opt.MapFrom(src => src.LocationId))

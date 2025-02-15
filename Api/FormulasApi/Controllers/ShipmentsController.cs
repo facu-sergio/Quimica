@@ -50,12 +50,12 @@ namespace FormulasApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> InsertShipment(ShipmentCreateDto shipment)
+        public async Task<IActionResult> InsertShipment(Shipment shipment)
         {
             try
             {
-                var shipmentFormt = _mapper.Map<Shipment>(shipment);
-                await _shipmentService.InsertShipment(shipmentFormt);
+                //var shipmentFormt = _mapper.Map<Shipment>(shipment);
+                await _shipmentService.InsertShipment(shipment);
 
                 return Ok(new { Message = "Operación exitosa" });
             }

@@ -4,6 +4,7 @@ using Quimica.Core.DataAccess;
 using Quimica.Service.Business;
 using Quimica.Service.DataAccess;
 using Microsoft.OpenApi.Models;
+using Quimica.Core.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,18 @@ builder.Services.AddSwaggerGen( c => {
     });
 });
 
+// Configuración de DbOptions desde appsettings.json
+builder.Services.Configure<DbOptions>(builder.Configuration.GetSection("DataBase"));
+
+// Registra IConnectionBuilder (ya resuelve IOptions<DbOptions> internamente)
+builder.Services.AddTransient<IConnectionBuilder, ConnectionBuilder>();
+
+// Registra el repositorio genérico (ahora depende de IConnectionBuilder)
+builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+// En Program.cs
+builder.Services.AddTransient<IGenericRepository<Shipment>, GenericRepository<Shipment>>();
+builder.Services.AddTransient<IGenericRepository<Address>, GenericRepository<Address>>();
+builder.Services.AddTransient<IGenericRepository<shipments_products>, GenericRepository<shipments_products>>();
 
 builder.Services.AddTransient<IConnectionBuilder, ConnectionBuilder>();
 builder.Services.AddTransient<IFormulaService, FormulaService>();
