@@ -1,9 +1,8 @@
-﻿using AutoMapper;
-using FormulasApi.DTOS;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Quimica.Core.Bussiness;
 using Quimica.Core.Models;
-using Quimica.Service.Business;
+using Quimica.Service.DTOS;
 
 namespace FormulasApi.Controllers
 {
@@ -19,20 +18,20 @@ namespace FormulasApi.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
+        [HttpGet("GetAllByDate")]
         public async Task<IActionResult> getAllByDate(DateTime date)
         {
             try
             {
+               /* var shipments = await _shipmentService.GetShipmentsByDate(date);
+                var shipmentDtos = _mapper.Map<IEnumerable<ShipmentDto>>(shipments)*/
                 var shipments = await _shipmentService.GetShipmentsByDate(date);
-                var shipmentDtos = _mapper.Map<IEnumerable<ShipmentDto>>(shipments);
-                return Ok(shipmentDtos);
+                return Ok(shipments);
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
-           
         }
 
         [HttpGet("GetShipment")]
@@ -40,7 +39,9 @@ namespace FormulasApi.Controllers
         {
             try
             {
-                return Ok(await _shipmentService.GetshipmentById(id));
+                var shipment = (await _shipmentService.GetshipmentById(id));
+                var shipmentFormat = _mapper.Map<ShipmentDto>(shipment);
+                return Ok(shipmentFormat);
             }
             catch (Exception ex)
             {
@@ -50,12 +51,12 @@ namespace FormulasApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> InsertShipment(ShipmentCreateDto shipment)
+        public async Task<IActionResult> InsertShipment(Shipment shipment)
         {
             try
             {
-                var shipmentFormt = _mapper.Map<Shipment>(shipment);
-                await _shipmentService.InsertShipment(shipmentFormt);
+                //var shipmentFormt = _mapper.Map<Shipment>(shipment);
+                await _shipmentService.InsertShipment(shipment);
 
                 return Ok(new { Message = "Operación exitosa" });
             }
@@ -97,10 +98,10 @@ namespace FormulasApi.Controllers
             return Ok(new { Message = "Operación exitosa" });
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> DeleteShipment(int idShipment)
+        [HttpPut("DeleteShipment")]
+        public async Task<IActionResult> DeleteShipment(int id)
         {
-            await _shipmentService.DeleteShipment(idShipment);
+            await _shipmentService.DeleteShipment(id);
             return NoContent();
         }
 

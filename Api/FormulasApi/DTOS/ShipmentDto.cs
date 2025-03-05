@@ -1,25 +1,20 @@
 ﻿using FormulasApi.DTOS;
-using Quimica.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FormulasApi.DTOS
+namespace Quimica.Service.DTOS
 {
-    public class ShipmentDto
+    public class ShipmentDto : AuditableDto
     {
-        public int? Id { get; set; }
-        public string ClientName { get; set; }
-        public string Location { get; set; }
-        public string Street { get; set; }
-        public string Number { get; set; }
-        public float Price { get; set; }
-        public string Note { get; set; }
+        public int Id { get; set; }
+        public float Precio { get; set; }
+        public string Nota { get; set; }    
+        //public DateTime Fecha { get; set; }
+        public AddresDto Direccion { get; set; }
+        public List<ShipmentProductDto> Products { get; set; }
 
-        public int? State { get; set; }  
-        public DateTime Date { get; set; }
-        public List<ProductShipmentDto> Products { get; set; } = new List<ProductShipmentDto>();
     }
 }

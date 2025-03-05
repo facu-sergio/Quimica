@@ -27,9 +27,13 @@ builder.Services.AddTransient<IFormulaService, FormulaService>();
 builder.Services.AddTransient<IFormulaRepository, FormulaRepository>();
 builder.Services.AddTransient<IShipmentService,ShipmentService>();
 builder.Services.AddTransient<IShipmentRepository,ShipmentRepository>();
-builder.Services.AddTransient<IproductRepository, ProductRepository>();
+builder.Services.AddTransient<IProductRepository, ProductRepository>();
 builder.Services.AddTransient<IProductService, ProductService>();
+builder.Services.AddTransient<IDireccionServices, DireccionService>();
 builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddScoped<DapperDataContext>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 
 builder.Services.AddCors(options =>
 {

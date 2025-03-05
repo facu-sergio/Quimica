@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 
 namespace Quimica.Core.DataAccess
 {
-    public interface IProductRepository : IGenericRepository<Product>
+    public interface IShipmentsProductsRepository : IGenericRepository<shipments_products>
     {
-
     }
 }

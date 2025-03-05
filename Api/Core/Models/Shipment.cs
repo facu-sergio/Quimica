@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Quimica.Core.Attributes;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,20 +9,28 @@ using System.Threading.Tasks;
 
 namespace Quimica.Core.Models
 {
-    public class Shipment
+    [TableName("Pedidos")]
+    public class Shipment : Auditable
     {
-        public int Id { get; set; }
-        public string ClientName { get; set; }
-        public float Price { get; set; }
-        public string Note { get; set; }
+        [ColumnName("id_direccion")]
+        public int Id_direccion { get; set; } // Hacer opcional con int?
 
-        public int? State { get; set; }
+        [Navigation(typeof(Address), "id_direccion")]
+        public Address? Direccion { get; set; } // Hacer opcional con ?
 
-        [Column(TypeName = "date")]
-        public DateTime Date { get; set; }
-        public Address Address { get; set; }
+        [ColumnName("fecha")]
+        public DateTime? Fecha { get; set; } 
 
-        public List<ProductOfShipment>? Products { get; set; } = new List<ProductOfShipment>();
-        
+        [ColumnName("nota")]
+        public string? Nota { get; set; } // Ya es opcional porque es string?
+
+        [ColumnName("id_estado")]
+        public int? id_estado { get; set; } // Hacer opcional con int?
+
+        [ColumnName("precio")]
+        public float? Precio { get; set; } // Hacer opcional con float?
+
+        [Navigation(typeof(shipments_products), "id_shipment")]
+        public List<shipments_products>? Products { get; set; } // Hacer opcional con ?
     }
 }
